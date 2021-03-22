@@ -36,12 +36,67 @@ class Agendamento {
                 if(erro) {
                     res.status(400).json(erro);
                 }else {
-                    res.status(201).json(resultados);
-                }
-            })
+                    res.status(201).json(agendamento);
+                };
+            });
+        };
+
+    };
+
+    lista(res) {
+        const sql = "SELECT * FROM Agendamentos"
+
+        conexao.query(sql, (erro, resultados) => {
+            if(erro) {
+                res.status(400).json(erro)
+            }else {
+                res.status(200).json(resultados)
+            };
+        });
+    };
+
+    buscaPorId(id, res) {
+        const sql = `SELECT * FROM Agendamentos WHERE id=${id}`
+
+        conexao.query(sql, (erro, resultados) => {
+            const agendamento = resultados[0];
+            if(erro) {
+                res.status(400).json(erro)
+            }else {
+                res.status(200).json(agendamento)
+            };
+        });   
+    };
+
+    altera(id, valores, res) {
+
+        if(valores.dataMarcada){
+            valores.dataMarcada = moment(valores.dataMarcada, "DD/MM/YYYY").format("YYYY/MM/DD HH:mm:ss");
         }
 
-    }
-}
+        const sql = 'UPDATE Agendamentos SET ? WHERE id=?'
+
+        conexao.query(sql, [valores, id], (erro, resultados) => {
+            if(erro) {
+                res.status(400).json(erro)
+            }else {
+                res.status(200).json({...valores, id})
+            }
+        });
+    }; 
+    
+    deleta(id, res) {
+        const sql = "DELETE FROM Agendamentos WHERE id=?"
+
+        conexao.query(sql, id, (erro, resultados) => {
+            if(erro) {
+                res.status(400).json(erro)
+            }else {
+                res.status(200).json({id})
+            }
+        });
+    };
+
+};
 
 module.exports = new Agendamento;
